@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+</head>
+<body>
+<div th:object="${sortModel}">
+    <div th:if="${sortModel.getFind()==null}">
+        <form method="GET" th:action="@{/documents/sort/search}">
+            <label for="find1">Поиск:</label>
+            <input type="text" id="find1" name="find"/>
+            <input type="submit" value="Найти">
+        </form>
+    </div>
+    <div th:unless="${sortModel.getFind()==null}">
+        <form method="GET" th:action="@{/documents/sort/search}">
+            <label for="find2">Поиск:</label>
+            <input type="text" th:field="*{find}" id="find2" name="find"/>
+            <input type="submit" value="Найти">
+        </form>
+        <form method="GET" th:action="@{/documents/sort/search/reset}">
+            <input type="submit" value="Сброс"/>
+        </form>
+    </div>
+    <br>
+
+
+    <form th:method="GET" th:action="@{/documents/sort}">
+        <table>
+            <form th:method="DELETE"></form>
+            <tr>
+                <th>Наименование</th>
+                <th>Тип
+                    <select th:field="*{sortType}" name="sortType">
+                        <option value="">Не указано</option>
+                        <option th:each="t : ${types}" th:value="${t.type}"
+                                th:text="${t.type}"></option>
+                    </select>
+                </th>
+                <th>Размер</th>
+                <th>Дата добавления
+                    <select th:field="*{sortDateChange}" name="sortDateChange">
+                        <option value="">Не указано</option>
+                        <option value="rise">По возрастанию</option>
+                        <option value="decrease">По убыванию</option>
+                    </select>
+                </th>
+                <th>Дата изменения</th>
+                <th><input type="submit" value="Сортировать"/></th>
+            </tr>
+            <div th:if="${documents.isEmpty()}">
+                <tr>
+                    <td>Ничего не найдено!</td>
+                </tr>
+            </div>
+            <div th:unless="${documents.isEmpty()}">
+                <tr th:each="document : ${documents}">
+                    <td th:text="${document.getTitle()}"/>
+                    <td th:text="${document.getType()}"/>
+                    <td th:text="${document.getSize()} + 'МБ'"/>
+                    <td th:text="${#dates.format(document.getDateChange(), 'dd/MMM/yyyy hh:mm:ss')}"/>
+                    <td th:text="${#dates.format(document.getDateCreation(), 'dd/MMM/yyyy hh:mm:ss')}"/>
+                    <td>
+                        <form th:method="DELETE"
+                              th:action="@{/documents/{id}(id=${document.getId()})}">
+                            <input type="submit" value="Удалить"/>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="GET"
+                              th:action="@{/documents/{id}/edit(id=${document.getId()})}">
+                            <input type="submit" value="Изменить"/>
+                        </form>
+                    </td>
+                </tr>
+            </div>
+        </table>
+        <br>
+        Страницы:
+        <div th:each="page, iter : ${pages}">
+            <div th:if="${iter.size>1}">
+                <div th:unless="${sortModel.find==null}">
+                    <a th:href="@{'/documents?page='+${iter.index}+'&list='+${list}+'&find='+${find}}"
+                       th:text="${iter.index+1}"/>
+                </div>
+                <div th:if="${sortModel.find==null}">
+                    <a th:href="@{'/documents?page='+${iter.index}+'&list='+${list}+'&'+${sortModel.getUrl()}}"
+                       th:text="${iter.index+1}"/>
+                </div>
+            </div>
+        </div>
+        <br>
+    </form>
+
+    Добавить новый документ
+    <form th:method="POST" th:action="@{/documents/upload}" enctype="multipart/form-data">
+        <input name="file" type="file"/>
+        <br>
+        <input type="submit" value="Добавить"/>
+    </form>
+</div>
+</body>
+</html>

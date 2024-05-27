@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>edit</title>
+</head>
+<body>
+<form th:method="PATCH" th:action="@{/documents/{id}(id=${document.getId()})}"
+      enctype="multipart/form-data" th:object="${document}">
+
+    <p th:text="'Название: '+${document.getTitle()}"></p>
+    <input type="text" th:field="*{title}">
+    <p th:text="'Тип: '+${document.getType()}"></p>
+    <p th:text="'Размер: '+${document.getSize()} +' МБ'"/>
+    <p th:text="'Дата создания: ' + ${#dates.format(document.getDateChange(), 'dd/MMM/yyyy в hh:mm:ss')}"></p>
+    <p th:text="'Дата изменения: '+ ${#dates.format(document.getDateCreation(), 'dd/MMM/yyyy в hh:mm:ss')}"></p>
+
+    <input type="submit" value="Изменить">
+</form>
+<br>
+<div th:if="${sortModel.find==null}">
+    <a th:href="@{/documents}">Назад</a>
+</div>
+
+<div th:unless="${sortModel.find==null}">
+    <a th:href="@{'/documents/sort/search?find='+${sortModel.find}}">Назад</a>
+</div>
+</body>
+</html>
